@@ -6,8 +6,6 @@ import Hero from "../components/Hero";
 import ShowCase from "../components/ShowCase";
 import FeaturedTopics from "../components/FeaturedTopics";
 import ThreeMain from "../components/ThreeMain";
-import DokaDesc from "../components/DokaDesc";
-import RaiseForAnyone from "../components/RaiseForAnyone";
 
 function HomePage() {
   return (
@@ -16,8 +14,6 @@ function HomePage() {
       <ShowCase />
       <FeaturedTopics />
       <ThreeMain />
-      <DokaDesc />
-      <RaiseForAnyone />
     </>
   );
 }

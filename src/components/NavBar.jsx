@@ -1,47 +1,94 @@
-/* eslint-disable no-unused-vars */
-import React, { useState } from "react";
-import { AiOutlineMenu } from "react-icons/ai";
-import { AiOutlineClose } from "react-icons/ai";
+import React, { useState, useEffect } from "react";
+import { AiOutlineMenu, AiOutlineClose } from "react-icons/ai";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faSearch } from "@fortawesome/free-solid-svg-icons";
 
 const NavBar = () => {
-  const [nav, setnav] = useState(false);
-  const handlemenu = () => {
-    setnav(!nav);
+  const [nav, setNav] = useState(false);
+  const [scrolling, setScrolling] = useState(false);
+
+  const handleMenu = () => {
+    setNav(!nav);
   };
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 0) {
+        setScrolling(true);
+      } else {
+        setScrolling(false);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+
+    // Cleanup event listener on component unmount
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   return (
-    <div className="flex justify-between items-center h-24 max-w-[1240px] mx-auto">
-      <h1 className="w-full text-3xl font-bold font-sans text-[#00df9a] ">
-        Doka
-      </h1>
-      <ul className="hidden md:flex">
-        <li className="p-4">Fundraiser</li>
-        <li className="p-4">Donate</li>
-        <li className="p-4">About</li>
-        <li className="p-4">
+    <div
+      className={`sticky top-0 z-10 bg-white w-full h-24 mx-auto flex justify-between items-center px-4 ${
+        scrolling ? "shadow-md" : ""
+      }`}
+    >
+      <h1 className="text-3xl font-bold font-sans text-[#00df9a]">Doka</h1>
+      <ul className="hidden md:flex items-center">
+        <li className="px-4 py-1 hover:bg-[#f7f7f7] hover:rounded-lg">
+          <div>
+            <FontAwesomeIcon
+              icon={faSearch}
+              size="lg"
+              className="text-gray-600 mr-3"
+            />{" "}
+            <p className=" inline">Serach</p>
+          </div>
+        </li>
+        <li className="px-4 py-1  hover:rounded-lg ">Fundraiser</li>
+        <li className="px-4 py-1 hover:bg-[#f7f7f7] hover:rounded-lg">
+          Donate
+        </li>
+        <li className="px-4 py-1 hover:bg-[#f7f7f7] hover:rounded-lg">About</li>
+        <li className="px-4 py-1 hover:bg-[#f7f7f7] hover:rounded-lg">
           <button>SignUp</button>
         </li>
-        <li className="p-4">SignIn</li>
+        <li className="px-4">SignIn</li>
       </ul>
-      <div onClick={handlemenu} className="block md:hidden">
+      <div onClick={handleMenu} className="block md:hidden cursor-pointer">
         {!nav ? <AiOutlineMenu size={20} /> : <AiOutlineClose size={20} />}
       </div>
       <div
-        className={
-          nav
-            ? "fixed left-0 top-0 w-[60%] h-full border-r  border-r-gray-900 bg-[#000300] text-white ease-in-out duration-500"
-            : "fixed left-[-100%]"
-        }
+        className={`fixed left-0 top-0 w-[60%] h-full border-r border-r-gray-900 bg-[#000300] text-white ease-in-out duration-500 ${
+          nav ? "translate-x-0" : "-translate-x-full"
+        }`}
       >
-        <h1 className="w-full text-3xl font-bold text-[#00df9a] m-4">Doka</h1>
-
-        <ul className="pt-10 uppercase p4">
-          <li className="p-4 border-b border-gray-600">Fundraiser</li>
-          <li className="p-4 border-b border-gray-600">Donate</li>
-          <li className="p-4 border-b border-gray-600">About</li>
-          <li className="p-4 border-b border-gray-600">
+        <h1 className="text-3xl font-bold text-[#00df9a] m-4">Doka</h1>
+        <ul className="pt-10 uppercase">
+          <li className="p-4 border-b border-gray-600 hover:bg-[#2828285d]">
+            <div>
+              <FontAwesomeIcon
+                icon={faSearch}
+                size="lg"
+                className="text-gray-600 mr-3"
+              />{" "}
+              <p className=" inline">Serach</p>
+            </div>
+          </li>
+          <li className="p-4 border-b border-gray-600 hover:bg-[#282828]">
+            Fundraiser
+          </li>
+          <li className="p-4 border-b border-gray-600 hover:bg-[#2828285d]">
+            Donate
+          </li>
+          <li className="p-4 border-b border-gray-600 hover:bg-[#2828285d]">
+            About
+          </li>
+          <li className="p-4 border-b border-gray-600 hover:bg-[#2828285d]">
             <button>SignUp</button>
           </li>
-          <li className="p-4 border-b border-gray-600">SignIn</li>
+          <li className="p-4 border-b border-gray-600 hover:bg-[#2828285d]">
+            SignIn
+          </li>
         </ul>
       </div>
     </div>
