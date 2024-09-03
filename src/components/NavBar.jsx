@@ -44,15 +44,23 @@ const NavBar = () => {
             <p className=" inline">Serach</p>
           </div>
         </li>
-        <li className="px-4 py-1  hover:rounded-lg ">Fundraiser</li>
+        <li className="px-4 py-1 hover:bg-[#f7f7f7]  hover:rounded-lg ">
+          Fundraiser
+        </li>
         <li className="px-4 py-1 hover:bg-[#f7f7f7] hover:rounded-lg">
           Donate
         </li>
         <li className="px-4 py-1 hover:bg-[#f7f7f7] hover:rounded-lg">About</li>
-        <li className="px-4 py-1 hover:bg-[#f7f7f7] hover:rounded-lg">
-          <button>SignUp</button>
+        <li className="">
+          <button className="bg-[#00df9a] hover:bg-[#007b56] hover:text-[#e0e0e0] px-3 py-1 rounded-lg">
+            SignUp
+          </button>
         </li>
-        <li className="px-4">SignIn</li>
+        <li className="">
+          <button className=" ml-1 bg-[#dcdcdc] border-x-black hover:bg-[#007b56] hover:text-[#e0e0e0] px-3 py-1 rounded-lg">
+            SignIn
+          </button>
+        </li>
       </ul>
       <div onClick={handleMenu} className="block md:hidden cursor-pointer">
         {!nav ? <AiOutlineMenu size={20} /> : <AiOutlineClose size={20} />}
