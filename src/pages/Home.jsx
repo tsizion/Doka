@@ -8,7 +8,12 @@ import FeaturedTopics from "../components/FeaturedTopics";
 import ThreeMain from "../components/ThreeMain";
 import DokaDesc from "../components/DokaDesc";
 import RaiseForAnyone from "../components/RaiseForAnyone";
-
+import HowItWorks from "../components/HowItWork";
+import UserForm from "../components/Forms/userForm";
+import ReferralForm from "../components/Forms/ReferralForm";
+import StudentInfoForm from "../components/Forms/studentInfo";
+import StudentNeedForm from "../components/Forms/StudentNeedForm";
+import DonorForm from "../components/Forms/DonationForm";
 function HomePage() {
   return (
     <>
@@ -17,7 +22,13 @@ function HomePage() {
       <FeaturedTopics />
       <ThreeMain />
       <DokaDesc />
+      <HowItWorks />
       <RaiseForAnyone />
+      <DonorForm />
+      <StudentNeedForm />
+      <UserForm />
+      <ReferralForm />
+      <StudentInfoForm />
     </>
   );
 }
