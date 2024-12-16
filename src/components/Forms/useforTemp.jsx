@@ -7,8 +7,6 @@ import {
   signInWithPhoneNumber,
   PhoneAuthProvider,
   signInWithCredential,
-  GoogleAuthProvider,
-  signInWithPopup,
 } from "firebase/auth";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -22,6 +20,7 @@ const UserForm = ({ onSubmit }) => {
     phoneNumber: "",
     password: "",
     profession: "", // Added profession field
+
     status: "Active",
   });
   const [otp, setOtp] = useState("");
@@ -112,43 +111,10 @@ const UserForm = ({ onSubmit }) => {
     }
   };
 
-  const handleGoogleSignIn = async () => {
-    const provider = new GoogleAuthProvider();
-    setLoading(true);
-
-    try {
-      const result = await signInWithPopup(auth, provider);
-      const user = result.user;
-
-      // Populate formData with Google user information
-      setFormData({
-        ...formData,
-        firstName: user.displayName.split(" ")[0] || "",
-        lastName: user.displayName.split(" ").slice(1).join(" ") || "",
-        email: user.email || "",
-        phoneNumber: user.phoneNumber || "",
-      });
-
-      toast.success("Signed in with Google successfully!");
-      onSubmit({
-        ...formData,
-        firstName: user.displayName.split(" ")[0] || "",
-        lastName: user.displayName.split(" ").slice(1).join(" ") || "",
-        email: user.email || "",
-      });
-    } catch (error) {
-      console.error("Google Sign-In failed:", error);
-      toast.error("Google Sign-In failed. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
   return (
     <div className="max-w-lg mx-auto bg-white shadow-md rounded-lg p-6 mt-10">
       <h2 className="text-2xl font-bold text-gray-700 mb-6">User Form</h2>
       <form onSubmit={otpSent ? verifyOtpAndSubmit : sendOtp}>
-        {/* Existing form fields */}
         <div className="mb-4">
           <label
             htmlFor="firstName"
@@ -291,16 +257,6 @@ const UserForm = ({ onSubmit }) => {
         >
           {otpSent ? "Verify OTP" : "Send OTP"}
         </button>
-        {/* ... */}
-        <div className="flex items-center justify-center mt-4">
-          <button
-            type="button"
-            onClick={handleGoogleSignIn}
-            className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600"
-          >
-            Sign Up with Google
-          </button>
-        </div>
       </form>
       <ToastContainer />
     </div>

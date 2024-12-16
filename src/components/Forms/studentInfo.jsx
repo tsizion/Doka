@@ -347,23 +347,23 @@ const StudentInfoForm = ({ onSubmit }) => {
         {/* Funding Needs */}
         <div className="mb-4">
           <label
-            htmlFor="fundingNeeds"
-            className="block text-gray-600 font-medium mb-1"
+            htmlFor="needDescription"
+            className="block text-gray-600 font-medium "
           >
-            Funding Needs
+            Description of Need
           </label>
           <textarea
-            id="fundingNeeds"
-            name="fundingNeeds"
-            value={formData.fundingNeeds}
+            id="needDescription"
+            name="needDescription"
+            value={formData.needDescription}
             onChange={handleChange}
-            placeholder="Describe the funding needs (max 1200 characters)"
-            maxLength="360"
-            className="w-full border  rounded-lg p-3 overflow-y-scroll resize-none custom-scroll"
+            placeholder="Describe the student's need (max 1200 characters)"
+            maxLength="1200"
+            className="w-full border rounded-lg overflow-y-scroll resize-none custom-scroll"
             style={{ height: "90px" }}
           />
-          {errors.fundingNeeds && (
-            <p className="text-red-500 text-sm">{errors.fundingNeeds}</p>
+          {errors.needDescription && (
+            <p className="text-red-500 text-sm">{errors.needDescription}</p>
           )}
         </div>
 

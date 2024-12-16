@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { AiOutlineMenu, AiOutlineClose } from "react-icons/ai";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSearch } from "@fortawesome/free-solid-svg-icons";
+import { Link } from "react-router-dom";
 
 const NavBar = () => {
   const [nav, setNav] = useState(false);
@@ -57,14 +58,17 @@ const NavBar = () => {
           Donate
         </li>
         <li className="px-4 py-1 hover:bg-[#f7f7f7] hover:rounded-lg">About</li>
+        <li className="px-4 py-1 hover:bg-[#f7f7f7] hover:rounded-lg">
+          <Link to="/referral">Referral</Link>
+        </li>
         <li>
           <button className="bg-[#00df9a] hover:bg-[#007b56] hover:text-[#e0e0e0] px-3 py-1 rounded-lg">
-            SignUp
+            Login
           </button>
         </li>
         <li>
           <button className="ml-1 bg-[#dcdcdc] border-x-black hover:bg-[#007b56] hover:text-[#e0e0e0] px-3 py-1 rounded-lg">
-            SignIn
+            <Link to="/signup">SignUp</Link>
           </button>
         </li>
       </ul>
@@ -105,10 +109,13 @@ const NavBar = () => {
             About
           </li>
           <li className="p-4 border-b border-gray-600 hover:bg-[#2828285d]">
-            <button>SignUp</button>
+            <Link to="/referral">Referral</Link>
           </li>
           <li className="p-4 border-b border-gray-600 hover:bg-[#2828285d]">
-            SignIn
+            <button>Login</button>
+          </li>
+          <li className="p-4 border-b border-gray-600 hover:bg-[#2828285d]">
+            <Link to="/signup">SignUp</Link>
           </li>
         </ul>
       </div>
