@@ -17,6 +17,7 @@ import { auth } from "../../firebase/setup"; // Adjust path as needed
 import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
 import Logo from "../../assets/logo.png"; // Adjust path as needed
 import { signInWithRedirect, getRedirectResult } from "firebase/auth";
+import { jwtDecode } from "jwt-decode";
 
 const UserForm = ({ onSubmit }) => {
   const [formData, setFormData] = useState({
@@ -158,18 +159,39 @@ const UserForm = ({ onSubmit }) => {
   };
 
   const handleGoogleSignIn = async (credentialResponse) => {
-    console.log(credentialResponse); // This logs the response from Google OAuth
-    const provider = new GoogleAuthProvider();
-    setLoading(true);
+    console.log("Google Credential Response:", credentialResponse);
 
     try {
-      // Start the sign-in process using redirect flow
-      await signInWithRedirect(auth, provider);
+      // Decode the Google Credential JWT
+      const decodedToken = jwtDecode(credentialResponse.credential);
+      console.log("Decoded Token:", decodedToken);
+
+      // Extract user details
+      const { given_name, family_name, email, picture, sub } = decodedToken;
+      console.log("email", email, decodedToken);
+
+      // Update form data with the decoded values
+      setFormData({
+        ...formData,
+        firstName: given_name || "",
+        lastName: family_name || "",
+        email: email || "",
+        googleId: sub, // Google user ID
+        profileImage: picture || "", // Optional: profile picture
+      });
+
+      // Pass the user data to onSubmit for further processing
+      toast.success("Signed in with Google successfully!");
+      onSubmit({
+        firstName: given_name || "",
+        lastName: family_name || "",
+        email: email || "",
+        googleId: sub, // Unique Google user ID
+        profileImage: picture || "",
+      });
     } catch (error) {
-      console.error("Google Sign-In failed:", error);
-      toast.error("Google Sign-In failed. Please try again.");
-    } finally {
-      setLoading(false);
+      console.error("Error decoding Google Credential:", error);
+      toast.error("Failed to process Google Sign-In. Please try again.");
     }
   };
 
