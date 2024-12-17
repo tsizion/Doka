@@ -1,18 +1,15 @@
 /* eslint-disable react/prop-types */
 import React, { useState } from "react";
-import PhoneInput from "react-phone-input-2";
-import "react-phone-input-2/lib/style.css";
-import {
-  RecaptchaVerifier,
-  signInWithPhoneNumber,
-  PhoneAuthProvider,
-  signInWithCredential,
-  GoogleAuthProvider,
-  signInWithPopup,
-} from "firebase/auth";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
-import { auth } from "../../firebase/setup"; // Adjust path as needed
+import { Link } from "react-router-dom";
+import { GoogleOAuthProvider } from "@react-oauth/google";
+import Logo from "../../assets/logo.png"; // Adjust path as needed
+import { ToastContainer } from "react-toastify";
+import PhoneInputField from "./PhoneInputField";
+import InputField from "./InputField";
+import OTPField from "./OTPField";
+import ProfessionField from "./PhoneInputField";
+import GoogleSignIn from "./GoogleSignIn";
+import { validateForm, sendOtp, verifyOtpAndSubmit } from "./formUtils";
 
 const UserForm = ({ onSubmit }) => {
   const [formData, setFormData] = useState({
@@ -21,7 +18,7 @@ const UserForm = ({ onSubmit }) => {
     email: "",
     phoneNumber: "",
     password: "",
-    profession: "", // Added profession field
+    profession: "",
     status: "Active",
   });
   const [otp, setOtp] = useState("");
@@ -36,274 +33,116 @@ const UserForm = ({ onSubmit }) => {
     setErrors({ ...errors, [name]: "" });
   };
 
-  const validateForm = () => {
-    const newErrors = {};
-    if (!formData.firstName.trim())
-      newErrors.firstName = "First Name is required.";
-    if (!formData.lastName.trim())
-      newErrors.lastName = "Last Name is required.";
-    if (!formData.phoneNumber.trim())
-      newErrors.phoneNumber = "Phone Number is required.";
-    if (!formData.password.trim()) newErrors.password = "Password is required.";
-    else if (formData.password.length < 6)
-      newErrors.password = "Password must be at least 6 characters.";
-    return newErrors;
-  };
-
-  const sendOtp = async (e) => {
+  const handleOtp = async (e) => {
     e.preventDefault();
-    const validationErrors = validateForm();
-    if (Object.keys(validationErrors).length > 0) {
-      setErrors(validationErrors);
-      return;
-    }
-
-    setLoading(true);
-
-    try {
-      if (!window.recaptchaVerifier) {
-        window.recaptchaVerifier = new RecaptchaVerifier(
-          auth,
-          "recaptcha-container",
-          {
-            hl: "en", // Explicitly set the language to English
-          }
-        );
-      }
-
-      const appVerifier = window.recaptchaVerifier;
-
-      const confirmationResult = await signInWithPhoneNumber(
-        auth,
-        `+${formData.phoneNumber}`,
-        appVerifier
+    if (otpSent) {
+      await verifyOtpAndSubmit(
+        e,
+        otp,
+        verificationId,
+        setLoading,
+        onSubmit,
+        formData
       );
-
-      setVerificationId(confirmationResult.verificationId);
-      setOtpSent(true);
-      toast.success("OTP sent to your phone!");
-    } catch (error) {
-      console.error("Error sending OTP:", error);
-      setErrors({ phoneNumber: "Failed to send OTP. Try again." });
-      toast.error("Failed to send OTP. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const verifyOtpAndSubmit = async (e) => {
-    e.preventDefault();
-    if (!otp.trim()) {
-      setErrors({ otp: "Please enter the OTP." });
-      return;
-    }
-
-    setLoading(true);
-
-    try {
-      const credential = PhoneAuthProvider.credential(verificationId, otp);
-      await signInWithCredential(auth, credential);
-      toast.success("OTP verified successfully!");
-      onSubmit(formData);
-    } catch (error) {
-      console.error("OTP Verification failed:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleGoogleSignIn = async () => {
-    const provider = new GoogleAuthProvider();
-    setLoading(true);
-
-    try {
-      const result = await signInWithPopup(auth, provider);
-      const user = result.user;
-
-      // Populate formData with Google user information
-      setFormData({
-        ...formData,
-        firstName: user.displayName.split(" ")[0] || "",
-        lastName: user.displayName.split(" ").slice(1).join(" ") || "",
-        email: user.email || "",
-        phoneNumber: user.phoneNumber || "",
-      });
-
-      toast.success("Signed in with Google successfully!");
-      onSubmit({
-        ...formData,
-        firstName: user.displayName.split(" ")[0] || "",
-        lastName: user.displayName.split(" ").slice(1).join(" ") || "",
-        email: user.email || "",
-      });
-    } catch (error) {
-      console.error("Google Sign-In failed:", error);
-      toast.error("Google Sign-In failed. Please try again.");
-    } finally {
-      setLoading(false);
+    } else {
+      const validationErrors = validateForm(formData);
+      if (Object.keys(validationErrors).length > 0) {
+        setErrors(validationErrors);
+        return;
+      }
+      await sendOtp(
+        formData.phoneNumber,
+        setErrors,
+        setLoading,
+        setOtpSent,
+        setVerificationId
+      );
     }
   };
 
   return (
-    <div className="max-w-lg mx-auto bg-white shadow-md rounded-lg p-6 mt-10">
-      <h2 className="text-2xl font-bold text-gray-700 mb-6">User Form</h2>
-      <form onSubmit={otpSent ? verifyOtpAndSubmit : sendOtp}>
-        {/* Existing form fields */}
-        <div className="mb-4">
-          <label
-            htmlFor="firstName"
-            className="block text-gray-600 font-medium mb-1"
-          >
-            First Name
-          </label>
-          <input
-            type="text"
-            id="firstName"
-            name="firstName"
-            value={formData.firstName}
-            onChange={handleChange}
-            placeholder="Enter first name"
-            className="w-full border  rounded-lg p-3"
-          />
-          {errors.firstName && (
-            <p className="text-red-500 text-sm">{errors.firstName}</p>
-          )}
-        </div>
-        <div className="mb-4">
-          <label
-            htmlFor="lastName"
-            className="block text-gray-600 font-medium mb-1"
-          >
-            Last Name
-          </label>
-          <input
-            type="text"
-            id="lastName"
-            name="lastName"
-            value={formData.lastName}
-            onChange={handleChange}
-            placeholder="Enter last name"
-            className="w-full border  rounded-lg p-3"
-          />
-          {errors.lastName && (
-            <p className="text-red-500 text-sm">{errors.lastName}</p>
-          )}
-        </div>
-        <div className="mb-4">
-          <label
-            htmlFor="email"
-            className="block text-gray-600 font-medium mb-1"
-          >
-            Email (Optional)
-          </label>
-          <input
-            type="email"
-            id="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            placeholder="Enter email address"
-            className="w-full border  rounded-lg p-3"
-          />
-        </div>
-        <div className="mb-4">
-          <label
-            htmlFor="profession"
-            className="block text-gray-600 font-medium mb-1"
-          >
-            Profession (Optional)
-          </label>
-          <input
-            type="text"
-            id="profession"
-            name="profession"
-            value={formData.profession}
-            onChange={handleChange}
-            placeholder="Enter your profession"
-            className="w-full border rounded-lg p-3"
-          />
-        </div>
-
-        <div className="mb-4">
-          <label
-            htmlFor="phoneNumber"
-            className="block text-gray-600 font-medium mb-1"
-          >
-            Phone Number
-          </label>
-          <PhoneInput
-            country={"us"}
-            value={formData.phoneNumber}
-            onChange={(value) =>
-              setFormData({ ...formData, phoneNumber: value })
-            }
-          />
-          {errors.phoneNumber && (
-            <p className="text-red-500 text-sm">{errors.phoneNumber}</p>
-          )}
-        </div>
-        <div className="mb-4">
-          <label
-            htmlFor="password"
-            className="block text-gray-600 font-medium mb-1"
-          >
-            Password
-          </label>
-          <input
-            type="password"
-            id="password"
-            name="password"
-            value={formData.password}
-            onChange={handleChange}
-            placeholder="Enter password"
-            className="w-full border  rounded-lg p-3"
-          />
-          {errors.password && (
-            <p className="text-red-500 text-sm">{errors.password}</p>
-          )}
-        </div>
-        {otpSent && (
-          <div className="mb-4">
-            <label
-              htmlFor="otp"
-              className="block text-gray-600 font-medium mb-1"
-            >
-              Enter OTP
-            </label>
-            <input
-              type="text"
-              id="otp"
-              value={otp}
-              onChange={(e) => setOtp(e.target.value)}
-              placeholder="Enter OTP"
-              className="w-full border  rounded-lg p-3"
-            />
-            {errors.otp && <p className="text-red-500 text-sm">{errors.otp}</p>}
+    <GoogleOAuthProvider clientId="19393764387-ugj97uf2hc7k02mv57bko1ga1fngd90r.apps.googleusercontent.com">
+      <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
+        <div className="bg-white shadow-md rounded-lg w-full max-w-md p-6">
+          <div className="flex items-center justify-center mb-4">
+            <img src={Logo} alt="Logo" className="h-12" />
           </div>
-        )}
-        <div id="recaptcha-container"></div>
-        <button
-          type="submit"
-          className={`w-full py-3 rounded-lg text-white ${
-            loading ? "bg-gray-400" : "bg-indigo-500 hover:bg-indigo-600"
-          }`}
-          disabled={loading}
-        >
-          {otpSent ? "Verify OTP" : "Send OTP"}
-        </button>
-        {/* ... */}
-        <div className="flex items-center justify-center mt-4">
-          <button
-            type="button"
-            onClick={handleGoogleSignIn}
-            className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600"
-          >
-            Sign Up with Google
-          </button>
+          <h2 className="text-xl font-bold text-gray-700 mb-4 text-center">
+            Create Account
+          </h2>
+          <form onSubmit={handleOtp} className="space-y-4">
+            <InputField
+              label="First Name"
+              name="firstName"
+              value={formData.firstName}
+              onChange={handleChange}
+              error={errors.firstName}
+            />
+            <InputField
+              label="Last Name"
+              name="lastName"
+              value={formData.lastName}
+              onChange={handleChange}
+              error={errors.lastName}
+            />
+            <InputField
+              label="Email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              error={errors.email}
+            />
+            <PhoneInputField
+              value={formData.phoneNumber}
+              onChange={(value) =>
+                setFormData({ ...formData, phoneNumber: value })
+              }
+              error={errors.phoneNumber}
+            />
+            <InputField
+              label="Password"
+              type="password"
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
+              error={errors.password}
+            />
+            <ProfessionField
+              value={formData.profession}
+              onChange={handleChange}
+              error={errors.profession}
+            />
+            {otpSent && (
+              <OTPField otp={otp} setOtp={setOtp} error={errors.otp} />
+            )}
+            <div id="recaptcha-container"></div>
+            <button
+              type="submit"
+              className={`w-full py-2 rounded-lg text-white text-sm ${
+                loading ? "bg-gray-400" : "bg-indigo-500 hover:bg-indigo-600"
+              }`}
+              disabled={loading}
+            >
+              {otpSent ? "Verify OTP" : "Send OTP"}
+            </button>
+          </form>
+          <div className="mt-4 text-center">
+            <p className="text-sm">
+              Already have an account?{" "}
+              <Link to="/login" className="text-blue-500 hover:underline">
+                Login
+              </Link>
+            </p>
+          </div>
+          <GoogleSignIn
+            setFormData={setFormData}
+            setLoading={setLoading}
+            onSubmit={onSubmit}
+          />
         </div>
-      </form>
-      <ToastContainer />
-    </div>
+        <ToastContainer />
+      </div>
+    </GoogleOAuthProvider>
   );
 };
 

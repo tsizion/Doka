@@ -12,7 +12,7 @@ import {
 import MainLayout from "./layouts/MainLayout";
 import HomePage from "./pages/Home";
 import ReferralForm from "./components/Forms/ReferralForm";
-import UserForm from "./components/Forms/userForm";
+import UserForm from "./components/Forms/userForm2";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -20,7 +20,7 @@ const router = createBrowserRouter(
       <Route index element={<HomePage />} />
       <Route path="login" element={<LoginPage />} />
       <Route path="referral" element={<ReferralForm onSubmit={() => {}} />} />
-      <Route path="signup" element={<UserForm />} />
+      <Route path="signup" element={<UserForm onSubmit={() => {}} />} />
     </Route>
   )
 );
